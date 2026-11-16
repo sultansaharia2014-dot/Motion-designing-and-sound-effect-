@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1991 SOSUS Great Acoustic Void — Animated Short</title>
+  <style>
+    :root {
+      --bg: #0c1118;
+      --panel: rgba(20, 27, 38, 0.9);
+      --border: rgba(255, 255, 255, 0.12);
+      --accent: #38bdf8;
+      --danger: #ff4757;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #162235 0%, var(--bg) 75%);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .stage-wrap {
+      position: relative;
+      height: calc(100vh - 118px);
+      max-height: 920px;
+      aspect-ratio: 9 / 16;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 0 2px rgba(255, 255, 255, 0.1);
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+
+    .rec-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(220, 38, 38, 0.92);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 6px 11px;
+      border-radius: 999px;
+      display: none;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.5);
+      pointer-events: none;
+    }
+
+    .rec-badge.active {
+      display: flex;
+    }
+
+    .rec-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #fff;
+      animation: pulse 0.9s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.75); }
+    }
+
+    .controls {
+      width: min(760px, 96vw);
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .scrubber-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .time-label {
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      min-width: 84px;
+      text-align: center;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent) var(--prog, 0%), rgba(255,255,255,0.14) var(--prog, 0%));
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--accent);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      transition: transform 0.12s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .btn-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, transform 0.1s, border-color 0.15s;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #08121e;
+      border-color: transparent;
+    }
+
+    button.primary:hover {
+      background: #67d0fc;
+    }
+
+    button.record {
+      background: rgba(255, 71, 87, 0.16);
+      border-color: rgba(255, 71, 87, 0.45);
+      color: #ff8a95;
+    }
+
+    button.record:hover {
+      background: rgba(255, 71, 87, 0.28);
+    }
+
+    button.record.recording {
+      background: var(--danger);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .scene-pills {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .scene-pill {
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 7px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .scene-pill.active {
+      color: #08121e;
+      background: #ffd43b;
+      border-color: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stage-wrap">
+    <canvas id="stage" width="1080" height="1920"></canvas>
+    <div id="recBadge" class="rec-badge">
+      <span class="rec-dot"></span>
+      <span id="recText">REC 00:00</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="scrubber-row">
+      <span id="timeLabel" class="time-label">00:00 / 01:12</span>
+      <input id="scrubber" type="range" min="0" max="72" step="0.02" value="0" />
+    </div>
+    <div class="btn-row">
+      <div class="btn-group">
+        <button id="playBtn" class="primary">▶ Play</button>
+        <button id="restartBtn">↺ Restart</button>
+        <button id="muteBtn">🔊 SFX On</button>
+      </div>
+      <div class="scene-pills" id="scenePills">
+        <button class="scene-pill" data-t="0">Hook</button>
+        <button class="scene-pill" data-t="5">SOSUS</button>
+        <button class="scene-pill" data-t="20">Silence</button>
+        <button class="scene-pill" data-t="40">Theories</button>
+        <button class="scene-pill" data-t="60">Ending</button>
+      </div>
+      <button id="recordBtn" class="record">● Record Video</button>
+    </div>
+  </div>
+
+  <script>
+  (() => {
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+    const W = 1080;
+    const H = 1920;
+    const DURATION = 72.0;
+
+    // UI Elements
+    const playBtn = document.getElementById('playBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    const recordBtn = document.getElementById('recordBtn');
+    const scrubber = document.getElementById('scrubber');
+    const timeLabel = document.getElementById('timeLabel');
+    const recBadge = document.getElementById('recBadge');
+    const recText = document.getElementById('recText');
+    const scenePills = Array.from(document.querySelectorAll('.scene-pill'));
+
+    // Playback State
+    let currentTime = 0;
+    let isPlaying = false;
+    let lastTimestamp = null;
+    let isMuted = false;
+
+    // Recording State
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    // =========================================================================
+    // WEB AUDIO API SYNTHESIZED SFX ENGINE
+    // =========================================================================
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.master = null;
+        this.mediaDest = null;
+        this.ambientGain = null;
+        this.ambientOsc1 = null;
+        this.ambientOsc2 = null;
+        this.firedCues = new Set();
+        this.cues = this.buildCues();
+      }
+
+      init() {
+        if (this.ctx) {
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          return;
+        }
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioCtx();
+        this.master = this.ctx.createGain();
+        this.master.gain.value = isMuted ? 0 : 0.85;
+
+        this.mediaDest = this.ctx.createMediaStreamDestination();
+        this.master.connect(this.ctx.destination);
+        this.master.connect(this.mediaDest);
+
+        // Ambient deep underwater / bunker hum
+        this.ambientGain = this.ctx.createGain();
+        this.ambientGain.gain.value = 0;
+        this.ambientGain.connect(this.master);
+
+        this.ambientOsc1 = this.ctx.createOscillator();
+        this.ambientOsc1.type = 'sine';
+        this.ambientOsc1.frequency.value = 58;
+
+        this.ambientOsc2 = this.ctx.createOscillator();
+        this.ambientOsc2.type = 'triangle';
+        this.ambientOsc2.frequency.value = 116.5;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 190;
+
+        this.ambientOsc1.connect(filter);
+        this.ambientOsc2.connect(filter);
+        filter.connect(this.ambientGain);
+        this.ambientOsc1.start();
+        this.ambientOsc2.start();
+      }
+
+      setMuted(m) {
+        if (this.master) {
+          this.master.gain.setTargetAtTime(m ? 0 : 0.85, this.ctx.currentTime, 0.02);
+        }
+      }
+
+      updateAmbient(t, playing) {
+        if (!this.ctx || !this.ambientGain) return;
+        const inSilence = (t >= 20.0 && t < 40.0) || (t >= 60.0 && t < 61.2);
+        let target = 0;
+        if (playing && !inSilence) {
+          target = t >= 61.2 ? 0.14 : 0.09;
+        }
+        // Hard cut at the moment of silence for visceral shock
+        if (inSilence || !playing) {
+          this.ambientGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        } else {
+          this.ambientGain.gain.setTargetAtTime(target, this.ctx.currentTime, 0.06);
+        }
+      }
+
+      resetCues(time = 0) {
+        this.firedCues.clear();
+        for (const c of this.cues) {
+          if (c.t < time) this.firedCues.add(c.id);
+        }
+      }
+
+      checkCues(prevT, currT) {
+        if (!this.ctx) return;
+        for (const c of this.cues) {
+          if (!this.firedCues.has(c.id) && currT >= c.t && prevT <= c.t + 0.25) {
+            this.firedCues.add(c.id);
+            c.fn();
+          }
+        }
+      }
+
+      ping(freq = 1280, dur = 0.75, vol = 0.24) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.96, now + dur);
+
+        g.gain.setValueAtTime(0.001, now);
+        g.gain.linearRampToValueAtTime(vol, now + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        osc.connect(g);
+        g.connect(this.master);
+        osc.start(now);
+        osc.stop(now + dur + 0.05);
+      }
+
+      pop(pitch = 520, up = true) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(up ? pitch * 0.65 : pitch * 1.35, now);
+        osc.frequency.exponentialRampToValueAtTime(up ? pitch * 1.45 : pitch * 0.55, now + 0.085);
+
+        g.gain.setValueAtTime(0.22, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+        osc.connect(g);
+        g.connect(this.master);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      }
+
+      bassDrop(startFreq = 120, endFreq = 32, dur = 0.9, vol = 0.55) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(startFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, now + dur);
+
+        g.gain.setValueAtTime(vol, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+        osc.connect(g);
+        g.connect(this.master);
+        osc.start(now);
+        osc.stop(now + dur + 0.05);
+      }
+
+      shockCut() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        // Sharp high click + low thump + eerie descending whine
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(640, now);
+        osc.frequency.exponentialRampToValueAtTime(75, now + 0.24);
+        g.gain.setValueAtTime(0.28, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(g);
+        g.connect(this.master);
+        osc.start(now);
+        osc.stop(now + 0.26);
+        this.bassDrop(95, 28, 0.35, 0.45);
+      }
+
+      whaleSong() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(280, now);
+        osc.frequency.linearRampToValueAtTime(430, now + 0.35);
+        osc.frequency.linearRampToValueAtTime(220, now + 0.95);
+        g.gain.setValueAtTime(0.001, now);
+        g.gain.linearRampToValueAtTime(0.14, now + 0.15);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+        osc.connect(g);
+        g.connect(this.master);
+        osc.start(now);
+        osc.stop(now + 1.05);
+      }
+
+      slap(vol = 0.28) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const bufferSize = this.ctx.sampleRate * 0.12;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.025));
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 950;
+        const g = this.ctx.createGain();
+        g.gain.value = vol;
+        noise.connect(filter);
+        filter.connect(g);
+        g.connect(this.master);
+        noise.start(now);
+      }
+
+      stampSlam() {
+        this.slap(0.5);
+        this.bassDrop(140, 34, 0.55, 0.65);
+      }
+
+      buildCues() {
+        return [
+          { id: 'c0',  t: 0.15, fn: () => this.whaleSong() },
+          { id: 'c1',  t: 1.4,  fn: () => this.pop(540, true) },
+          { id: 'c2',  t: 2.6,  fn: () => this.shockCut() },
+          { id: 'c3',  t: 3.5,  fn: () => this.pop(420, true) },
+          { id: 'c4',  t: 5.1,  fn: () => this.pop(600, true) },
+          { id: 'c5',  t: 6.8,  fn: () => this.ping(1320, 0.85, 0.22) },
+          { id: 'c6',  t: 9.6,  fn: () => this.ping(1180, 0.8, 0.20) },
+          { id: 'c7',  t: 11.4, fn: () => this.pop(700, true) },
+          { id: 'c8',  t: 14.6, fn: () => this.whaleSong() },
+          { id: 'c9',  t: 16.5, fn: () => this.ping(1400, 0.6, 0.16) },
+          { id: 'c10', t: 20.0, fn: () => this.shockCut() }, // Sudden silence slam
+          { id: 'c11', t: 23.8, fn: () => this.slap(0.28) },
+          { id: 'c12', t: 25.0, fn: () => this.slap(0.32) },
+          { id: 'c13', t: 26.8, fn: () => this.pop(360, false) },
+          { id: 'c14', t: 30.0, fn: () => this.pop(460, false) },
+          { id: 'c15', t: 35.2, fn: () => this.pop(510, true) },
+          { id: 'c16', t: 40.0, fn: () => this.bassDrop(110, 38, 0.7, 0.45) },
+          { id: 'c17', t: 44.6, fn: () => this.pop(580, true) },
+          { id: 'c18', t: 47.0, fn: () => this.bassDrop(90, 30, 0.8, 0.4) },
+          { id: 'c19', t: 51.6, fn: () => this.pop(660, true) },
+          { id: 'c20', t: 54.0, fn: () => this.ping(1550, 0.4, 0.18) },
+          { id: 'c21', t: 57.5, fn: () => this.pop(390, false) },
+          { id: 'c22', t: 60.0, fn: () => this.slap(0.22) },
+          { id: 'c23', t: 61.3, fn: () => this.bassDrop(85, 24, 1.3, 0.7) },
+          { id: 'c24', t: 63.4, fn: () => this.bassDrop(78, 22, 1.3, 0.72) },
+          { id: 'c25', t: 66.2, fn: () => this.ping(980, 1.2, 0.25) },
+          { id: 'c26', t: 69.3, fn: () => this.stampSlam() }
+        ];
+      }
+    }
+
+    const sfx = new SoundEngine();
+
+    // =========================================================================
+    // GRAPHIC HELPERS & PATTERNS (Reference Style: Thick Outlines + Cel Shade)
+    // =========================================================================
+    const INK = '#191615';
+    const FONT_DISPLAY = `'Impact', 'Arial Black', 'Trebuchet MS', sans-serif`;
+    const FONT_BOLD = `'Arial Black', 'Segoe UI', sans-serif`;
+
+    // Create reusable halftone dot pattern
+    const halftoneCanvas = document.createElement('canvas');
+    halftoneCanvas.width = 24;
+    halftoneCanvas.height = 24;
+    const hctx = halftoneCanvas.getContext('2d');
+    hctx.fillStyle = 'rgba(0, 0, 0, 0.16)';
+    hctx.beginPath();
+    hctx.arc(6, 6, 3.2, 0, Math.PI * 2);
+    hctx.arc(18, 18, 3.2, 0, Math.PI * 2);
+    hctx.fill();
+    const halftonePattern = ctx.createPattern(halftoneCanvas, 'repeat');
+
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function lerp(a, b, t) { return a + (b - a) * clamp(t, 0, 1); }
+
+    function easeOutBack(x) {
+      const c1 = 1.70158;
+      const c3 = c1 + 1;
+      const t = clamp(x, 0, 1);
+      return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+    }
+
+    function easeOutCubic(x) {
+      return 1 - Math.pow(1 - clamp(x, 0, 1), 3);
+    }
+
+    function springPop(t, start, dur = 0.28) {
+      if (t < start) return 0;
+      const u = (t - start) / dur;
+      return u >= 1 ? 1 : easeOutBack(u);
+    }
+
+    function roundRect(x, y, w, h, r, fill, stroke, lw = 8) {
+      ctx.beginPath();
+      const rad = Math.min(r, w / 2, h / 2);
+      ctx.moveTo(x + rad, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rad);
+      ctx.arcTo(x + w, y + h, x, y + h, rad);
+      ctx.arcTo(x, y + h, x, y, rad);
+      ctx.arcTo(x, y, x + w, y, rad);
+      ctx.closePath();
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = lw;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+      }
+    }
+
+    function drawBadge(text, x, y, scale = 1, bg = '#ffd43b', fg = '#191615', rot = -0.05) {
+      if (scale <= 0.01) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+      ctx.scale(scale, scale);
+      ctx.font = `900 54px ${FONT_BOLD}`;
+      const m = ctx.measureText(text);
+      const pw = m.width + 58;
+      const ph = 88;
+      // Drop shadow
+      roundRect(-pw / 2 + 8, -ph / 2 + 10, pw, ph, 18, 'rgba(0,0,0,0.45)', null);
+      roundRect(-pw / 2, -ph / 2, pw, ph, 18, bg, INK, 8);
+      ctx.fillStyle = fg;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 0, 3);
+      ctx.restore();
+    }
+
+    function drawComicHeader(text, x, y, color = '#ff9f1c', size = 86, scale = 1) {
+      if (scale <= 0.01) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.font = `900 ${size}px ${FONT_DISPLAY}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineJoin = 'round';
+      // Hard comic extrusion
+      ctx.fillStyle = '#000';
+      ctx.fillText(text, 8, 10);
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 18;
+      ctx.strokeText(text, 0, 0);
+      ctx.fillStyle = color;
+      ctx.fillText(text, 0, 0);
+      ctx.restore();
+    }
+
+    function drawSweatDrop(x, y, s = 1, t = 0) {
+      ctx.save();
+      ctx.translate(x, y + Math.sin(t * 9) * 5);
+      ctx.scale(s, s);
+      ctx.beginPath();
+      ctx.moveTo(0, -24);
+      ctx.quadraticCurveTo(20, 4, 16, 18);
+      ctx.arc(0, 16, 16, 0, Math.PI, false);
+      ctx.quadraticCurveTo(-20, 4, 0, -24);
+      ctx.closePath();
+      ctx.fillStyle = '#5eead4';
+      ctx.fill();
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 6;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // CHIBI CHARACTERS & PROPS (Exact Reference Proportions)
+    // =========================================================================
+    function drawChibiOperator(x, y, scale = 1, opts = {}) {
+      const {
+        mood = 'chill',     // 'chill', 'happy', 'smug', 'shocked', 'panicked', 'skeptic', 'terrified'
+        hat = 'navy',       // 'navy', 'headphones', 'none'
+        suit = '#334155',   // uniform color
+        accent = '#fbbf24', // trim
+        time = 0,
+        armLeft = 'down',   // 'down', 'mug', 'up', 'head', 'point'
+        armRight = 'down',
+        talking = false,
+        redGlow = false
+      } = opts;
+
+      const bob = mood === 'panicked'
+        ? Math.sin(time * 36) * 6
+        : Math.sin(time * 3.5) * 6;
+      const shakeX = mood === 'panicked' ? Math.sin(time * 48) * 5 : 0;
+
+      ctx.save();
+      ctx.translate(x + shakeX, y + bob);
+      ctx.scale(scale, scale);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // Body (cute bell/pill shape like reference soldiers/generals)
+      ctx.beginPath();
+      ctx.moveTo(-88, 230);
+      ctx.quadraticCurveTo(-96, 95, -52, 65);
+      ctx.lineTo(52, 65);
+      ctx.quadraticCurveTo(96, 95, 88, 230);
+      ctx.closePath();
+      ctx.fillStyle = suit;
+      ctx.fill();
+
+      // Cel shadow on right side of body
+      ctx.save();
+      ctx.clip();
+      ctx.fillStyle = 'rgba(0,0,0,0.22)';
+      ctx.fillRect(18, 50, 90, 200);
+      // Uniform collar & stripes
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(-95, 165, 190, 22);
+      ctx.fillStyle = accent;
+      ctx.fillRect(-95, 162, 190, 7);
+      // Tie / lapel V
+      ctx.beginPath();
+      ctx.moveTo(-26, 65);
+      ctx.lineTo(0, 128);
+      ctx.lineTo(26, 65);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fill();
+      ctx.restore();
+
+      // Body outline
+      ctx.beginPath();
+      ctx.moveTo(-88, 230);
+      ctx.quadraticCurveTo(-96, 95, -52, 65);
+      ctx.lineTo(52, 65);
+      ctx.quadraticCurveTo(96, 95, 88, 230);
+      ctx.closePath();
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 9;
+      ctx.stroke();
+
+      // Arms
+      const drawArm = (side, pose) => {
+        const s = side === 'left' ? -1 : 1;
+        ctx.save();
+        ctx.translate(s * 76, 105);
+        let ang = s * 0.28;
+        if (pose === 'up') ang = s * -2.25;
+        if (pose === 'head') ang = s * -2.5;
+        if (pose === 'mug') ang = s * -0.95;
+        if (pose === 'point') ang = s * -1.45;
+        ctx.rotate(ang);
+
+        ctx.beginPath();
+        ctx.moveTo(-18, 0);
+        ctx.quadraticCurveTo(-22, 55, 0, 72);
+        ctx.quadraticCurveTo(22, 55, 18, 0);
+        ctx.closePath();
+        ctx.fillStyle = suit;
+        ctx.fill();
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        // Cute stubby hand
+        ctx.beginPath();
+        ctx.arc(0, 72, 20, 0, Math.PI * 2);
+        ctx.fillStyle = '#fde6d8';
+        ctx.fill();
+        ctx.stroke();
+
+        // Coffee mug if holding
+        if (pose === 'mug') {
+          ctx.save();
+          ctx.translate(0, 76);
+          ctx.rotate(-ang);
+          roundRect(-26, -34, 50, 56, 8, '#f8fafc', INK, 7);
+          ctx.beginPath();
+          ctx.arc(26, -6, 14, -Math.PI / 2, Math.PI / 2);
+          ctx.strokeStyle = INK;
+          ctx.lineWidth = 7;
+          ctx.stroke();
+          // Steam
+          ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(-8, -42);
+          ctx.quadraticCurveTo(-16 + Math.sin(time * 5) * 6, -58, -4, -72);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+      };
+      drawArm('left', armLeft);
+      drawArm('right', armRight);
+
+      // Head (oversized cute round-oval chibi head)
+      ctx.save();
+      ctx.translate(0, -18);
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 108, 96, 0, 0, Math.PI * 2);
+      ctx.fillStyle = redGlow ? '#ffdede' : '#fde8da';
+      ctx.fill();
+
+      // Cel shadow on head
+      ctx.save();
+      ctx.clip();
+      ctx.fillStyle = redGlow ? 'rgba(255, 50, 50, 0.2)' : 'rgba(180, 120, 95, 0.16)';
+      ctx.beginPath();
+      ctx.ellipse(38, 12, 95, 92, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 108, 96, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 9;
+      ctx.stroke();
+
+      // Cute blush cheeks
+      if (mood === 'happy' || mood === 'chill') {
+        ctx.fillStyle = 'rgba(255, 115, 125, 0.38)';
+        ctx.beginPath();
+        ctx.ellipse(-58, 22, 16, 9, 0, 0, Math.PI * 2);
+        ctx.ellipse(58, 22, 16, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Expressive Cartoon Eyes & Mouth
+      const blink = Math.sin(time * 2.1) > 0.96 && mood !== 'shocked' && mood !== 'panicked';
+      ctx.strokeStyle = INK;
+      ctx.fillStyle = INK;
+      ctx.lineWidth = 7;
+
+      const drawEye = (ex) => {
+        if (blink) {
+          ctx.beginPath();
+          ctx.moveTo(ex - 16, 0);
+          ctx.lineTo(ex + 16, 0);
+          ctx.stroke();
+          return;
+        }
+        if (mood === 'happy') {
+          ctx.beginPath();
+          ctx.arc(ex, 6, 16, Math.PI * 1.1, Math.PI * 1.9);
+          ctx.stroke();
+        } else if (mood === 'shocked' || mood === 'panicked' || mood === 'terrified') {
+          // Big white comic circles + tiny trembling pupils
+          ctx.beginPath();
+          ctx.arc(ex, -2, 24, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff';
+          ctx.fill();
+          ctx.stroke();
+          ctx.beginPath();
+          const px = mood === 'panicked' ? Math.sin(time * 40) * 3 : 0;
+          ctx.arc(ex + px, -2, mood === 'terrified' ? 4.5 : 6.5, 0, Math.PI * 2);
+          ctx.fillStyle = INK;
+          ctx.fill();
+        } else if (mood === 'skeptic') {
+          ctx.beginPath();
+          ctx.ellipse(ex, 2, 13, 8, 0, 0, Math.PI * 2);
+          ctx.fillStyle = INK;
+          ctx.fill();
+          // Flat lid
+          ctx.beginPath();
+          ctx.moveTo(ex - 20, -8);
+          ctx.lineTo(ex + 20, -8);
+          ctx.stroke();
+        } else {
+          // Classic cute dot eyes
+          ctx.beginPath();
+          ctx.ellipse(ex, 0, 11, 14, 0, 0, Math.PI * 2);
+          ctx.fillStyle = INK;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(ex - 3, -5, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff';
+          ctx.fill();
+        }
+      };
+      drawEye(-42);
+      drawEye(42);
+
+      // Eyebrows
+      if (mood === 'smug' || mood === 'skeptic') {
+        ctx.beginPath();
+        ctx.moveTo(-62, -26); ctx.lineTo(-22, -16);
+        ctx.moveTo(22, -18);  ctx.lineTo(62, -28);
+        ctx.stroke();
+      } else if (mood === 'panicked' || mood === 'terrified') {
+        ctx.beginPath();
+        ctx.moveTo(-64, -30); ctx.lineTo(-24, -42);
+        ctx.moveTo(24, -42);  ctx.lineTo(64, -30);
+        ctx.stroke();
+      }
+
+      // Mouth
+      const talkOpen = talking ? (Math.sin(time * 18) * 0.5 + 0.5) * 10 : 0;
+      ctx.beginPath();
+      if (mood === 'happy' || mood === 'chill') {
+        ctx.arc(0, 26, 16, 0.15, Math.PI - 0.15);
+        ctx.stroke();
+      } else if (mood === 'smug') {
+        ctx.moveTo(-18, 34);
+        ctx.quadraticCurveTo(6, 42, 24, 24);
+        ctx.stroke();
+      } else if (mood === 'shocked') {
+        ctx.ellipse(0, 38, 12, 16, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#7f1d1d';
+        ctx.fill();
+        ctx.stroke();
+      } else if (mood === 'panicked' || mood === 'terrified') {
+        ctx.moveTo(-26, 42);
+        ctx.quadraticCurveTo(-12, 20 - talkOpen, 0, 32);
+        ctx.quadraticCurveTo(12, 20 - talkOpen, 26, 42);
+        ctx.quadraticCurveTo(0, 56 + talkOpen, -26, 42);
+        ctx.fillStyle = '#7f1d1d';
+        ctx.fill();
+        ctx.stroke();
+      } else {
+        ctx.moveTo(-18, 34);
+        ctx.lineTo(18, 34);
+        ctx.stroke();
+      }
+
+      // Big Navy Headphones (over ears)
+      if (hat === 'navy' || hat === 'headphones') {
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.arc(0, -14, 114, Math.PI * 1.05, Math.PI * 1.95);
+        ctx.stroke();
+
+        roundRect(-130, -32, 32, 68, 14, '#475569', INK, 8);
+        roundRect(98, -32, 32, 68, 14, '#475569', INK, 8);
+        // Foam pads
+        roundRect(-108, -26, 14, 56, 7, '#1e293b', INK, 5);
+        roundRect(94, -26, 14, 56, 7, '#1e293b', INK, 5);
+      }
+
+      // Navy Officer Cap
+      if (hat === 'navy') {
+        ctx.save();
+        ctx.translate(0, -82);
+        // Cap crown
+        ctx.beginPath();
+        ctx.moveTo(-98, 18);
+        ctx.quadraticCurveTo(-110, -45, 0, -52);
+        ctx.quadraticCurveTo(110, -45, 98, 18);
+        ctx.closePath();
+        ctx.fillStyle = '#f8fafc';
+        ctx.fill();
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 8;
+        ctx.stroke();
+        // Dark band + visor
+        roundRect(-94, 4, 188, 22, 6, '#1e293b', INK, 7);
+        ctx.beginPath();
+        ctx.ellipse(0, 26, 98, 16, 0, 0, Math.PI);
+        ctx.fillStyle = '#0f172a';
+        ctx.fill();
+        ctx.stroke();
+        // Gold emblem
+        ctx.beginPath();
+        ctx.arc(0, -16, 13, 0, Math.PI * 2);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fill();
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Panic sweat drops
+      if (mood === 'panicked' || mood === 'terrified') {
+        drawSweatDrop(-88, -58, 0.9, time);
+        drawSweatDrop(86, -42, 0.75, time + 1.2);
+      }
+
+      ctx.restore(); // end head
+      ctx.restore(); // end character
+    }
+
+    function drawChibiWhale(x, y, scale = 1, mood = 'sing', time = 0) {
+      ctx.save();
+      ctx.translate(x, y + Math.sin(time * 2.5) * 14);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // Tail fin
+      ctx.beginPath();
+      ctx.moveTo(110, 12);
+      ctx.quadraticCurveTo(165, -36, 192, -45);
+      ctx.quadraticCurveTo(175, -5, 160, 10);
+      ctx.quadraticCurveTo(185, 35, 194, 62);
+      ctx.quadraticCurveTo(155, 50, 110, 26);
+      ctx.closePath();
+      ctx.fillStyle = '#3b82f6';
+      ctx.fill();
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 8;
+      ctx.stroke();
+
+      // Main chubby body
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 135, 86, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#60a5fa';
+      ctx.fill();
+
+      // Belly
+      ctx.save();
+      ctx.clip();
+      ctx.fillStyle = '#dbeafe';
+      ctx.beginPath();
+      ctx.ellipse(-20, 68, 125, 55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 135, 86, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 9;
+      ctx.stroke();
+
+      // Cute eye
+      if (mood === 'sing') {
+        ctx.beginPath();
+        ctx.arc(-68, -10, 13, Math.PI * 1.1, Math.PI * 1.9);
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 7;
+        ctx.stroke();
+        // Open happy singing mouth
+        ctx.beginPath();
+        ctx.arc(-96, 22, 16, 0, Math.PI * 2);
+        ctx.fillStyle = '#991b1b';
+        ctx.fill();
+        ctx.stroke();
+        // Music note
+        ctx.fillStyle = '#ffd43b';
+        ctx.font = `900 56px ${FONT_BOLD}`;
+        ctx.fillText('♪', -170, -55 + Math.sin(time * 5) * 12);
+      } else {
+        // Shocked silent whale
+        ctx.beginPath();
+        ctx.arc(-68, -12, 22, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.lineWidth = 7;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(-72, -12, 6, 0, Math.PI * 2);
+        ctx.fillStyle = INK;
+        ctx.fill();
+        // Zipped / sealed mouth
+        ctx.beginPath();
+        ctx.moveTo(-112, 26);
+        ctx.lineTo(-70, 22);
+        ctx.stroke();
+        drawSweatDrop(-18, -76, 0.85, time);
+      }
+
+      ctx.restore();
+    }
+
+    function drawChibiSub(x, y, scale = 1, color = '#475569', flip = false, silent = false, time = 0) {
+      ctx.save();
+      ctx.translate(x, y + Math.sin(time * 3) * 8);
+      ctx.scale(flip ? -scale : scale, scale);
+      ctx.lineJoin = 'round';
+
+      // Periscope + conning tower
+      roundRect(-24, -84, 52, 48, 12, color, INK, 8);
+      ctx.beginPath();
+      ctx.moveTo(0, -84);
+      ctx.lineTo(0, -112);
+      ctx.lineTo(22, -112);
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 9;
+      ctx.stroke();
+
+      // Propeller
+      const propH = silent ? 28 : 12 + Math.abs(Math.sin(time * 28)) * 24;
+      roundRect(-132, -propH, 16, propH * 2, 6, '#f59e0b', INK, 7);
+
+      // Chubby sub hull
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 118, 52, 0, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 9;
+      ctx.stroke();
+
+      // Porthole / cute face
+      ctx.beginPath();
+      ctx.arc(46, -4, 18, 0, Math.PI * 2);
+      ctx.fillStyle = '#7dd3fc';
+      ctx.fill();
+      ctx.lineWidth = 7;
+      ctx.stroke();
+
+      if (!silent) {
+        // Little noise bubbles behind
+        for (let i = 0; i < 3; i++) {
+          const bx = -155 - ((time * 80 + i * 35) % 95);
+          const by = Math.sin(time * 6 + i) * 14;
+          ctx.beginPath();
+          ctx.arc(bx, by, 7 + i * 2, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,255,255,0.6)';
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawCRTMonitor(x, y, w, h, mode = 'active', time = 0, label = 'CH-01') {
+      ctx.save();
+      ctx.translate(x, y);
+      // Casing
+      roundRect(-w / 2, -h / 2, w, h, 24, '#334155', INK, 9);
+      // Screen
+      const pad = 22;
+      const sx = -w / 2 + pad;
+      const sy = -h / 2 + pad;
+      const sw = w - pad * 2;
+      const sh = h - pad * 2 - 22;
+      roundRect(sx, sy, sw, sh, 14, mode === 'spike' ? '#24090d' : '#051a14', INK, 7);
+
+      // Grid lines
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(sx, sy, sw, sh);
+      ctx.clip();
+      ctx.strokeStyle = mode === 'spike' ? 'rgba(255,70,70,0.22)' : 'rgba(52,211,153,0.18)';
+      ctx.lineWidth = 2;
+      for (let gx = sx; gx < sx + sw; gx += 40) {
+        ctx.beginPath(); ctx.moveTo(gx, sy); ctx.lineTo(gx, sy + sh); ctx.stroke();
+      }
+      for (let gy = sy; gy < sy + sh; gy += 40) {
+        ctx.beginPath(); ctx.moveTo(sx, gy); ctx.lineTo(sx + sw, gy); ctx.stroke();
+      }
+
+      // Waveform
+      ctx.beginPath();
+      const midY = sy + sh / 2;
+      for (let i = 0; i <= sw; i += 6) {
+        let amp = 0;
+        if (mode === 'active') {
+          amp = (Math.sin(i * 0.06 + time * 14) * 0.5 + Math.sin(i * 0.14 - time * 9) * 0.5) * (sh * 0.34);
+        } else if (mode === 'spike') {
+          const dist = Math.abs(i - ((time * 260) % sw));
+          const thump = dist < 40 ? Math.cos((dist / 40) * Math.PI * 0.5) * (sh * 0.44) : 0;
+          amp = thump * Math.sin(i * 0.4) + (Math.random() - 0.5) * 14;
+        } else {
+          amp = 0; // DEAD FLAT
+        }
+        const py = midY + amp;
+        if (i === 0) ctx.moveTo(sx + i, py);
+        else ctx.lineTo(sx + i, py);
+      }
+      ctx.strokeStyle = mode === 'spike' ? '#ff4757' : (mode === 'flat' ? '#ef4444' : '#34d399');
+      ctx.lineWidth = 7;
+      ctx.stroke();
+      ctx.restore();
+
+      // Label & status LED
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = `800 22px ${FONT_BOLD}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(label, sx + 8, sy + sh + 22);
+
+      ctx.beginPath();
+      ctx.arc(sx + sw - 16, sy + sh + 14, 9, 0, Math.PI * 2);
+      ctx.fillStyle = mode === 'active' ? '#22c55e' : '#ef4444';
+      ctx.fill();
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // KINETIC SUBTITLE ENGINE (Reference-Style Bouncy Outlined Subtitles)
+    // =========================================================================
+    const SUBTITLES = [
+      // Scene 1: Hook (0-5s)
+      { start: 0.2, end: 2.5, lines: [[{ t: 'THE', c: '#fff' }, { t: 'OCEAN FLOOR', c: '#38bdf8' }], [{ t: 'IS NEVER', c: '#fff' }, { t: 'QUIET...', c: '#ffd43b' }]] },
+      { start: 2.6, end: 4.9, lines: [[{ t: 'EXCEPT FOR', c: '#fff' }], [{ t: '4 TERRIFYING HOURS', c: '#ff4757' }], [{ t: 'IN 1991.', c: '#ffd43b' }]] },
+
+      // Scene 2: 1991 SOSUS Map & Sonar Intro (5-20s)
+      { start: 5.2, end: 9.4, lines: [[{ t: 'DURING THE', c: '#fff' }, { t: 'COLD WAR,', c: '#ff4757' }], [{ t: 'THE US NAVY', c: '#38bdf8' }, { t: 'BUILT SOSUS...', c: '#ffd43b' }]] },
+      { start: 9.6, end: 14.3, lines: [[{ t: 'SECRET', c: '#ffd43b' }, { t: 'UNDERWATER MICS', c: '#fff' }], [{ t: 'TRACKING EVERY', c: '#fff' }, { t: 'SUBMARINE.', c: '#ff4757' }]] },
+      { start: 14.5, end: 19.8, lines: [[{ t: 'WHALES, QUAKES, SHIPS...', c: '#38bdf8' }], [{ t: 'THE SEA WAS ALWAYS', c: '#fff' }], [{ t: 'BUZZING WITH', c: '#fff' }, { t: 'LIFE.', c: '#34d399' }]] },
+
+      // Scene 3: Sudden Silence (20-40s)
+      { start: 20.0, end: 23.6, lines: [[{ t: 'THEN AT', c: '#fff' }, { t: '3:14 AM...', c: '#ff4757' }], [{ t: 'EVERY SENSOR WENT', c: '#fff' }], [{ t: 'DEAD SILENT.', c: '#ff4757' }]] },
+      { start: 23.8, end: 29.4, lines: [[{ t: 'NOT A', c: '#fff' }, { t: 'GLITCH...', c: '#ffd43b' }], [{ t: 'THE ENTIRE', c: '#fff' }, { t: 'ATLANTIC', c: '#38bdf8' }], [{ t: 'JUST MUTED ITSELF.', c: '#ff4757' }]] },
+      { start: 29.6, end: 34.9, lines: [[{ t: 'NO WHALES.', c: '#38bdf8' }, { t: 'NO ENGINES.', c: '#fff' }], [{ t: 'EVEN SHRIMP', c: '#ffd43b' }, { t: 'STOPPED SNAPPING.', c: '#fff' }]] },
+      { start: 35.1, end: 39.8, lines: [[{ t: 'FOR', c: '#fff' }, { t: 'FOUR HOURS,', c: '#ff4757' }], [{ t: 'THE OCEAN BECAME AN', c: '#fff' }], [{ t: 'ACOUSTIC VOID.', c: '#ff4757' }]] },
+
+      // Scene 4: Theories (40-60s)
+      { start: 40.0, end: 44.4, lines: [[{ t: 'ANALYSTS ONLY HAD', c: '#fff' }], [{ t: 'TWO TERRIFYING', c: '#ff4757' }], [{ t: 'EXPLANATIONS.', c: '#ffd43b' }]] },
+      { start: 44.6, end: 51.4, lines: [[{ t: 'THEORY 1:', c: '#ffd43b' }, { t: 'STEALTH WEAPON', c: '#ff4757' }], [{ t: 'SWALLOWING SOUND', c: '#fff' }], [{ t: 'BEFORE AN ATTACK.', c: '#ff4757' }]] },
+      { start: 51.6, end: 56.8, lines: [[{ t: 'THEORY 2:', c: '#ffd43b' }, { t: 'THERMAL DUCT', c: '#38bdf8' }], [{ t: 'BOUNCING ALL SOUND', c: '#fff' }], [{ t: 'AWAY FROM MICS.', c: '#38bdf8' }]] },
+      { start: 57.0, end: 59.9, lines: [[{ t: 'ACROSS THE', c: '#fff' }, { t: 'ENTIRE', c: '#ffd43b' }], [{ t: 'OCEAN?!', c: '#ff4757' }]] },
+
+      // Scene 5: Cliffhanger (60-72s)
+      { start: 60.1, end: 65.4, lines: [[{ t: '4 HOURS LATER,', c: '#ffd43b' }], [{ t: 'SOUND SNAPPED BACK', c: '#fff' }], [{ t: 'WITH ONE', c: '#fff' }, { t: 'MASSIVE THUMP.', c: '#ff4757' }]] },
+      { start: 65.6, end: 72.0, lines: [[{ t: 'THE TAPE WAS', c: '#fff' }, { t: 'LOCKED AWAY.', c: '#ffd43b' }], [{ t: 'WHATEVER SILENCED THE SEA...', c: '#fff' }], [{ t: 'IS STILL', c: '#fff' }, { t: 'DOWN THERE.', c: '#ff4757' }]] }
+    ];
+
+    function drawSubtitles(t) {
+      const active = SUBTITLES.find(s => t >= s.start && t <= s.end);
+      if (!active) return;
+
+      const age = t - active.start;
+      const exitT = active.end - t;
+      const pop = age < 0.18 ? easeOutBack(age / 0.18) : (exitT < 0.1 ? exitT / 0.1 : 1);
+
+      ctx.save();
+      ctx.translate(W / 2, 1465);
+      ctx.scale(pop, pop);
+
+      const lineHeight = 76;
+      const startY = -((active.lines.length - 1) * lineHeight) / 2;
+
+      active.lines.forEach((line, li) => {
+        ctx.font = `900 62px ${FONT_DISPLAY}`;
+        const widths = line.map(w => ctx.measureText(w.t).width);
+        const space = 20;
+        const totalW = widths.reduce((a, b) => a + b, 0) + space * (line.length - 1);
+        let cx = -totalW / 2;
+        const cy = startY + li * lineHeight;
+
+        line.forEach((word, wi) => {
+          const wCenter = cx + widths[wi] / 2;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.lineJoin = 'round';
+          // Hard shadow
+          ctx.fillStyle = '#000';
+          ctx.fillText(word.t, wCenter + 5, cy + 7);
+          // Thick outline
+          ctx.strokeStyle = '#121010';
+          ctx.lineWidth = 17;
+          ctx.strokeText(word.t, wCenter, cy);
+          // Color fill
+          ctx.fillStyle = word.c;
+          ctx.fillText(word.t, wCenter, cy);
+
+          cx += widths[wi] + space;
+        });
+      });
+
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // SCENE RENDERERS
+    // =========================================================================
+
+    // SCENE 1: HOOK (0 - 5s)
+    function renderScene1(t) {
+      if (t < 2.6) {
+        // Bright lively deep sea
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#0ea5e9');
+        grad.addColorStop(0.65, '#1d4ed8');
+        grad.addColorStop(1, '#0f172a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Caustic light beams
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          const bx = 140 + i * 260 + Math.sin(t * 1.4 + i) * 30;
+          ctx.moveTo(bx, 0);
+          ctx.lineTo(bx + 120, 0);
+          ctx.lineTo(bx + 260, H);
+          ctx.lineTo(bx + 40, H);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Ocean floor
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.moveTo(0, 1250);
+        ctx.quadraticCurveTo(540, 1180, W, 1270);
+        ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = INK; ctx.lineWidth = 10; ctx.stroke();
+
+        // Singing Whale & Sub
+        drawChibiWhale(430 + Math.sin(t * 2) * 30, 560, 1.45, 'sing', t);
+        drawChibiSub(760 - t * 40, 940, 1.15, '#fbbf24', true, false, t);
+
+        // Sound ripples
+        for (let r = 0; r < 3; r++) {
+          const rad = ((t * 180 + r * 110) % 340) + 40;
+          ctx.beginPath();
+          ctx.arc(340, 560, rad, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 212, 59, ${1 - rad / 380})`;
+          ctx.lineWidth = 6;
+          ctx.stroke();
+        }
+      } else {
+        // Sudden shock frame!
+        const lt = t - 2.6;
+        const shakeX = lt < 0.25 ? (Math.random() - 0.5) * 26 : 0;
+        const shakeY = lt < 0.25 ? (Math.random() - 0.5) * 26 : 0;
+        ctx.save();
+        ctx.translate(shakeX, shakeY);
+
+        ctx.fillStyle = '#18090d';
+        ctx.fillRect(-30, -30, W + 60, H + 60);
+
+        // Comic shock starburst rays
+        ctx.save();
+        ctx.translate(W / 2, 760);
+        ctx.fillStyle = '#3f0d18';
+        for (let i = 0; i < 16; i++) {
+          ctx.rotate((Math.PI * 2) / 16);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-42, -1100);
+          ctx.lineTo(42, -1100);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+
+        drawChibiOperator(W / 2, 820, 2.05, {
+          mood: 'terrified',
+          hat: 'navy',
+          armLeft: 'head',
+          armRight: 'head',
+          time: t,
+          redGlow: true
+        });
+
+        drawBadge('1991: TOP SECRET', W / 2, 300, springPop(t, 2.75), '#ff4757', '#fff', -0.04);
+        drawComicHeader('DEAD SILENCE', W / 2, 1180, '#ffd43b', 92, springPop(t, 3.3));
+        ctx.restore();
+      }
+    }
+
+    // SCENE 2: 1991 SOSUS MAP & SONAR INTRO (5 - 20s)
+    function renderScene2(t) {
+      if (t < 14.5) {
+        // Reference-style stylized muted ocean map + tan continents + halftone dots
+        const zoom = t < 9.5 ? lerp(1.0, 1.25, (t - 5) / 4.5) : lerp(1.25, 1.5, (t - 9.5) / 5);
+        ctx.save();
+        ctx.translate(W / 2, 820);
+        ctx.scale(zoom, zoom);
+        ctx.translate(-W / 2, -820);
+
+        ctx.fillStyle = '#3c6e8c';
+        ctx.fillRect(-200, -200, W + 400, H + 400);
+        ctx.fillStyle = halftonePattern;
+        ctx.fillRect(-200, -200, W + 400, H + 400);
+
+        // North America landmass (left)
+        ctx.beginPath();
+        ctx.moveTo(-120, 180);
+        ctx.lineTo(290, 260);
+        ctx.lineTo(350, 440);
+        ctx.lineTo(260, 620);
+        ctx.lineTo(330, 820);
+        ctx.lineTo(190, 1080);
+        ctx.lineTo(240, 1340);
+        ctx.lineTo(-120, 1460);
+        ctx.closePath();
+        ctx.fillStyle = '#9b8f68';
+        ctx.fill();
+        ctx.strokeStyle = INK; ctx.lineWidth = 10; ctx.stroke();
+
+        // Europe / Africa landmass (right)
+        ctx.beginPath();
+        ctx.moveTo(1200, 140);
+        ctx.lineTo(840, 280);
+        ctx.lineTo(780, 480);
+        ctx.lineTo(880, 690);
+        ctx.lineTo(740, 920);
+        ctx.lineTo(810, 1280);
+        ctx.lineTo(1200, 1420);
+        ctx.closePath();
+        ctx.fillStyle = '#8b805c';
+        ctx.fill();
+        ctx.stroke();
+
+        // SOSUS Hydrophone Network Lines (GIUK Gap & Atlantic Array)
+        const nodes = [
+          { x: 320, y: 480 }, { x: 470, y: 420 }, { x: 630, y: 390 }, { x: 780, y: 440 },
+          { x: 300, y: 690 }, { x: 480, y: 740 }, { x: 660, y: 710 },
+          { x: 260, y: 940 }, { x: 460, y: 1020 }, { x: 670, y: 980 }
+        ];
+        ctx.save();
+        ctx.setLineDash([16, 12]);
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(270, 520);
+        nodes.slice(0, 4).forEach(n => ctx.lineTo(n.x, n.y));
+        ctx.moveTo(270, 690);
+        nodes.slice(4, 7).forEach(n => ctx.lineTo(n.x, n.y));
+        ctx.moveTo(230, 960);
+        nodes.slice(7).forEach(n => ctx.lineTo(n.x, n.y));
+        ctx.stroke();
+        ctx.restore();
+
+        // Pulsing hydrophone nodes
+        nodes.forEach((n, idx) => {
+          const pulse = ((t * 1.8 + idx * 0.25) % 1);
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 12 + pulse * 36, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(56, 189, 248, ${1 - pulse})`;
+          ctx.lineWidth = 4;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 12, 0, Math.PI * 2);
+          ctx.fillStyle = '#34d399';
+          ctx.fill();
+          ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.stroke();
+        });
+
+        // Sneaking Soviet Sub detected!
+        if (t >= 9.5) {
+          const subProgress = clamp((t - 9.5) / 5.0, 0, 1);
+          const sx = lerp(690, 490, subProgress);
+          const sy = lerp(520, 630, subProgress);
+          drawChibiSub(sx, sy, 0.72, '#dc2626', true, false, t);
+          // Red target ring
+          ctx.beginPath();
+          ctx.arc(sx, sy, 85 + Math.sin(t * 10) * 8, 0, Math.PI * 2);
+          ctx.strokeStyle = '#ff4757';
+          ctx.lineWidth = 7;
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Morphing Comic Header like 0:08 in reference!
+        if (t < 6.8) {
+          drawComicHeader('MODERN OCEAN', W / 2, 240, '#ffd43b', 82, springPop(t, 5.1));
+        } else {
+          drawComicHeader('1991: COLD WAR', W / 2, 240, '#ff9f1c', 86, springPop(t, 6.8));
+        }
+        if (t >= 9.8) {
+          drawBadge('SOSUS GRID: ACTIVE', W / 2, 1200, springPop(t, 9.8), '#34d399', INK, 0.03);
+        }
+      } else {
+        // Cozy Sonar Bunker Room (14.5 - 20s)
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = halftonePattern;
+        ctx.fillRect(0, 0, W, H);
+
+        // Bunker wall panel
+        roundRect(60, 160, W - 120, 740, 32, '#273549', INK, 10);
+
+        // 3 active CRT Monitors
+        drawCRTMonitor(290, 390, 360, 260, 'active', t, 'NORTH ATLANTIC');
+        drawCRTMonitor(790, 390, 360, 260, 'active', t + 1.1, 'GIUK GAP');
+        drawCRTMonitor(540, 680, 480, 240, 'active', t + 2.3, 'DEEP TRENCH');
+
+        // Desk
+        roundRect(40, 1080, W - 80, 340, 26, '#64748b', INK, 10);
+
+        // Vibing Chibi Operator sipping coffee
+        drawChibiOperator(540, 955, 1.55, {
+          mood: 'happy',
+          hat: 'navy',
+          armLeft: 'mug',
+          armRight: 'down',
+          time: t
+        });
+
+        // Floating music notes showing cozy background noise
+        ctx.fillStyle = '#34d399';
+        ctx.font = `900 58px ${FONT_BOLD}`;
+        ctx.fillText('♪', 210, 810 + Math.sin(t * 4) * 16);
+        ctx.fillText('♫', 840, 790 + Math.cos(t * 4) * 16);
+      }
+    }
+
+    // SCENE 3: SUDDEN SILENCE / SHOCKED OPERATORS (20 - 40s)
+    function renderScene3(t) {
+      if (t < 29.5) {
+        // Bunker flatline panic!
+        ctx.fillStyle = '#141923';
+        ctx.fillRect(0, 0, W, H);
+
+        roundRect(60, 160, W - 120, 740, 32, '#1f2633', INK, 10);
+
+        // All monitors FLATLINE
+        drawCRTMonitor(290, 390, 360, 260, 'flat', t, 'NORTH ATLANTIC');
+        drawCRTMonitor(790, 390, 360, 260, 'flat', t, 'GIUK GAP');
+        drawCRTMonitor(540, 680, 480, 240, 'flat', t, 'DEEP TRENCH');
+
+        // Digital Clock
+        roundRect(380, 76, 320, 96, 18, '#090d16', INK, 8);
+        ctx.fillStyle = '#ff4757';
+        ctx.font = `900 56px monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('03:14 UTC', 540, 126);
+
+        // Desk
+        roundRect(40, 1080, W - 80, 340, 26, '#475569', INK, 10);
+
+        if (t < 23.8) {
+          // Frozen shock + falling mug
+          drawChibiOperator(540, 955, 1.55, {
+            mood: 'shocked',
+            hat: 'navy',
+            armLeft: 'up',
+            armRight: 'up',
+            time: t
+          });
+          // Dropping mug
+          const fallY = 980 + easeOutCubic((t - 20.1) / 0.6) * 140;
+          ctx.save();
+          ctx.translate(310, fallY);
+          ctx.rotate(0.6);
+          roundRect(-24, -28, 48, 52, 8, '#f8fafc', INK, 7);
+          ctx.restore();
+        } else {
+          // Panicking & smacking monitor!
+          const slapPhase = Math.sin(t * 20) > 0;
+          drawChibiOperator(540, 955, 1.55, {
+            mood: 'panicked',
+            hat: 'navy',
+            armLeft: 'head',
+            armRight: slapPhase ? 'point' : 'up',
+            talking: true,
+            time: t
+          });
+          drawBadge('0.00 dB', 810, 260, springPop(t, 24.4), '#ff4757', '#fff', 0.06);
+        }
+      } else if (t < 35.0) {
+        // Underwater Void: silent whale, silent sub, shushing shrimp
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#091524');
+        grad.addColorStop(1, '#020617');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        drawChibiWhale(390, 520, 1.35, 'silent', t);
+        drawChibiSub(750, 920, 1.1, '#64748b', true, true, t);
+
+        // Tiny cartoon shrimp holding "SHHH" sign
+        ctx.save();
+        ctx.translate(280, 1050);
+        // Shrimp body
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 54, 34, -0.3, 0, Math.PI * 2);
+        ctx.fillStyle = '#fb7185';
+        ctx.fill();
+        ctx.strokeStyle = INK; ctx.lineWidth = 7; ctx.stroke();
+        // Wide eyes
+        ctx.beginPath(); ctx.arc(-24, -10, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(-26, -10, 4, 0, Math.PI * 2);
+        ctx.fillStyle = INK; ctx.fill();
+        // Sign
+        roundRect(40, -110, 165, 76, 12, '#fef08a', INK, 7);
+        ctx.fillStyle = INK;
+        ctx.font = `900 40px ${FONT_BOLD}`;
+        ctx.textAlign = 'center';
+        ctx.fillText('NOPE.', 122, -62);
+        ctx.restore();
+
+        drawBadge('TOTAL VOID', W / 2, 230, springPop(t, 29.8), '#0f172a', '#38bdf8', -0.03);
+      } else {
+        // Spinning clock + 3 frantic operators
+        ctx.fillStyle = '#181824';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = halftonePattern;
+        ctx.fillRect(0, 0, W, H);
+
+        // Giant stopwatch like reference 0:26!
+        const cx = W / 2, cy = 430;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 185, 0, Math.PI * 2);
+        ctx.fillStyle = '#f8fafc';
+        ctx.fill();
+        ctx.strokeStyle = INK; ctx.lineWidth = 12; ctx.stroke();
+
+        // Spinning hands (3 AM -> 7 AM)
+        const spin = ((t - 35.0) / 5.0) * Math.PI * 6;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(spin);
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -135);
+        ctx.strokeStyle = '#ff4757'; ctx.lineWidth = 12; ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(spin / 12 + 1.5);
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -90);
+        ctx.strokeStyle = INK; ctx.lineWidth = 14; ctx.stroke();
+        ctx.restore();
+
+        drawBadge('4 HOURS LATER', W / 2, 180, springPop(t, 35.3), '#ffd43b', INK, 0.03);
+
+        // Trio of panicked operators
+        drawChibiOperator(230, 980, 1.05, { mood: 'panicked', hat: 'navy', armLeft: 'head', armRight: 'up', time: t });
+        drawChibiOperator(850, 980, 1.05, { mood: 'shocked', hat: 'headphones', armLeft: 'up', armRight: 'head', time: t + 0.5 });
+        drawChibiOperator(540, 1020, 1.35, { mood: 'terrified', hat: 'navy', armLeft: 'head', armRight: 'head', talking: true, time: t + 0.2 });
+      }
+    }
+
+    // SCENE 4: THEORIES — STEALTH WEAPON VS THERMAL DUCT (40 - 60s)
+    function renderScene4(t) {
+      if (t < 44.5) {
+        // Diagonal Comic Split Screen (direct homage to 0:23 in reference!)
+        ctx.fillStyle = '#7c2d12';
+        ctx.fillRect(0, 0, W, H);
+
+        // Bottom-right half
+        ctx.beginPath();
+        ctx.moveTo(W, 380);
+        ctx.lineTo(0, 1180);
+        ctx.lineTo(0, H);
+        ctx.lineTo(W, H);
+        ctx.closePath();
+        ctx.fillStyle = '#0c4a6e';
+        ctx.fill();
+
+        // Halftone overlay
+        ctx.fillStyle = halftonePattern;
+        ctx.fillRect(0, 0, W, H);
+
+        // Top-left character (Military Brass)
+        drawChibiOperator(300, 510, 1.45, {
+          mood: 'smug',
+          hat: 'navy',
+          suit: '#365314',
+          armRight: 'point',
+          time: t
+        });
+
+        // Bottom-right character (Oceanographer)
+        drawChibiOperator(780, 980, 1.45, {
+          mood: 'skeptic',
+          hat: 'headphones',
+          suit: '#0284c7',
+          armLeft: 'up',
+          time: t + 0.4
+        });
+
+        // Lightning bolt diagonal divider
+        ctx.beginPath();
+        ctx.moveTo(W + 40, 350);
+        ctx.lineTo(580, 740);
+        ctx.lineTo(660, 790);
+        ctx.lineTo(-40, 1210);
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 28;
+        ctx.stroke();
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        drawComicHeader('2 THEORIES', W / 2, 210, '#ffd43b', 94, springPop(t, 40.2));
+      } else if (t < 51.5) {
+        // Theory 1: Stealth Weapon sucking up sound
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#3b0764');
+        grad.addColorStop(1, '#09090b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Giant dark acoustic-stealth sphere / black sub
+        const pulse = 1 + Math.sin(t * 8) * 0.04;
+        ctx.save();
+        ctx.translate(W / 2, 710);
+        ctx.scale(pulse, pulse);
+        ctx.beginPath();
+        ctx.arc(0, 0, 290, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 71, 87, 0.16)';
+        ctx.fill();
+        ctx.setLineDash([22, 16]);
+        ctx.strokeStyle = '#ff4757';
+        ctx.lineWidth = 8;
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+
+        drawChibiSub(W / 2, 710, 1.55, '#09090b', false, true, t);
+
+        // Musical notes getting sucked into the void
+        for (let i = 0; i < 6; i++) {
+          const ang = (i / 6) * Math.PI * 2 + t * 1.6;
+          const dist = 340 - ((t * 140 + i * 55) % 260);
+          ctx.fillStyle = '#ffd43b';
+          ctx.font = `900 54px ${FONT_BOLD}`;
+          ctx.fillText('♪', W / 2 + Math.cos(ang) * dist, 710 + Math.sin(ang) * dist);
+        }
+
+        drawBadge('THEORY #1: STEALTH', W / 2, 250, springPop(t, 44.7), '#ff4757', '#fff', -0.04);
+      } else {
+        // Theory 2: Thermal Duct bouncing sound away
+        ctx.fillStyle = '#082f49';
+        ctx.fillRect(0, 0, W, H);
+
+        // Warm upper ocean vs cold deep ocean
+        ctx.fillStyle = '#0284c7';
+        ctx.fillRect(0, 0, W, 620);
+
+        // Glowing Thermal Inversion Barrier
+        ctx.beginPath();
+        ctx.moveTo(0, 620);
+        for (let x = 0; x <= W; x += 60) {
+          ctx.lineTo(x, 620 + Math.sin(x * 0.015 + t * 4) * 18);
+        }
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 18;
+        ctx.stroke();
+
+        // Sound beams bouncing upward off the thermal duct!
+        for (let i = 0; i < 3; i++) {
+          const bx = 220 + i * 280;
+          ctx.beginPath();
+          ctx.moveTo(bx - 120, 260);
+          ctx.lineTo(bx, 610);
+          ctx.lineTo(bx + 120, 260);
+          ctx.strokeStyle = '#ffd43b';
+          ctx.lineWidth = 10;
+          ctx.stroke();
+        }
+
+        // Lonely SOSUS mic at bottom missing everything
+        roundRect(480, 1080, 120, 70, 16, '#34d399', INK, 8);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = `900 32px ${FONT_BOLD}`;
+        ctx.textAlign = 'center';
+        ctx.fillText('SOSUS MIC', 540, 1190);
+
+        drawBadge('THEORY #2: THERMAL DUCT', W / 2, 210, springPop(t, 51.7), '#38bdf8', INK, 0.03);
+
+        // Skeptical operator pops in at 56.8s!
+        if (t >= 56.8) {
+          const popY = lerp(1550, 960, easeOutBack((t - 56.8) / 0.35));
+          drawChibiOperator(830, popY, 1.35, {
+            mood: 'skeptic',
+            hat: 'navy',
+            armLeft: 'up',
+            time: t
+          });
+        }
+      }
+    }
+
+    // SCENE 5: EERIE CLIFFHANGER (60 - 72s)
+    function renderScene5(t) {
+      const shake = (t >= 61.3 && t < 61.8) || (t >= 63.4 && t < 63.9) || (t >= 69.3 && t < 69.7)
+        ? (Math.random() - 0.5) * 28 : 0;
+
+      ctx.save();
+      ctx.translate(shake, shake * 0.7);
+
+      // Dark red-lit bunker
+      ctx.fillStyle = '#12070a';
+      ctx.fillRect(-40, -40, W + 80, H + 80);
+
+      // Pulsing emergency red vignette
+      const redAlpha = 0.18 + Math.sin(t * 5) * 0.08;
+      ctx.fillStyle = `rgba(220, 38, 38, ${redAlpha})`;
+      ctx.fillRect(0, 0, W, H);
+
+      if (t < 65.5) {
+        // Spectrogram monitor spiking violently with a rhythmic THUMP
+        drawCRTMonitor(W / 2, 520, 860, 500, t < 61.2 ? 'flat' : 'spike', t, 'ANOMALY DETECTED');
+        drawChibiOperator(540, 1020, 1.45, {
+          mood: t < 61.2 ? 'panicked' : 'terrified',
+          hat: 'navy',
+          armLeft: 'head',
+          armRight: 'head',
+          redGlow: true,
+          time: t
+        });
+
+        if (t >= 61.3) {
+          drawComicHeader('THUMP...', 340, 210, '#ff4757', 84, springPop(t, 61.3));
+        }
+        if (t >= 63.4) {
+          drawComicHeader('THUMP...', 720, 290, '#ff4757', 84, springPop(t, 63.4));
+        }
+      } else {
+        // Dramatic zoom-in on terrified operator + giant silhouette in corner sonar
+        const zoom = lerp(1.0, 1.28, (t - 65.5) / 6.5);
+        ctx.save();
+        ctx.translate(W / 2, 850);
+        ctx.scale(zoom, zoom);
+        ctx.translate(-W / 2, -850);
+
+        // Background Sonar Radar showing massive shadow passing!
+        const rx = W / 2, ry = 490;
+        ctx.beginPath();
+        ctx.arc(rx, ry, 300, 0, Math.PI * 2);
+        ctx.fillStyle = '#071c16';
+        ctx.fill();
+        ctx.strokeStyle = INK; ctx.lineWidth = 12; ctx.stroke();
+
+        // Radar rings
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)';
+        ctx.lineWidth = 4;
+        [100, 200].forEach(r => {
+          ctx.beginPath(); ctx.arc(rx, ry, r, 0, Math.PI * 2); ctx.stroke();
+        });
+
+        // Giant Leviathan silhouette gliding across radar
+        ctx.save();
+        ctx.beginPath(); ctx.arc(rx, ry, 294, 0, Math.PI * 2); ctx.clip();
+        const lx = lerp(-180, 320, (t - 65.5) / 6.5);
+        ctx.fillStyle = 'rgba(255, 71, 87, 0.55)';
+        ctx.beginPath();
+        ctx.ellipse(rx + lx, ry - 20, 180, 56, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        drawChibiOperator(W / 2, 960, 1.85, {
+          mood: 'terrified',
+          hat: 'navy',
+          armLeft: 'head',
+          armRight: 'head',
+          redGlow: true,
+          time: t
+        });
+        ctx.restore();
+
+        // Heavy CLASSIFIED stamp slam at 69.3s!
+        if (t >= 69.3) {
+          const stampS = springPop(t, 69.3, 0.18);
+          ctx.save();
+          ctx.translate(W / 2, 470);
+          ctx.rotate(-0.18);
+          ctx.scale(stampS, stampS);
+          roundRect(-340, -95, 680, 190, 20, 'rgba(20, 5, 8, 0.82)', '#ff4757', 14);
+          ctx.fillStyle = '#ff4757';
+          ctx.font = `900 94px ${FONT_DISPLAY}`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('CLASSIFIED', 0, 4);
+          ctx.restore();
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // MAIN RENDER LOOP
+    // =========================================================================
+    function renderFrame(t) {
+      ctx.clearRect(0, 0, W, H);
+
+      if (t < 5.0)       renderScene1(t);
+      else if (t < 20.0) renderScene2(t);
+      else if (t < 40.0) renderScene3(t);
+      else if (t < 60.0) renderScene4(t);
+      else               renderScene5(t);
+
+      // Subtle corner watermark / timestamp bar
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      roundRect(38, 38, 220, 48, 12, 'rgba(0,0,0,0.45)', 'rgba(255,255,255,0.2)', 3);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = `800 24px ${FONT_BOLD}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SOSUS // 1991', 148, 63);
+      ctx.restore();
+
+      // Kinetic Subtitles always rendered cleanly on top
+      drawSubtitles(t);
+
+      // Sync UI
+      updateUI(t);
+    }
+
+    function fmtTime(sec) {
+      const s = Math.max(0, Math.floor(sec));
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
+    }
+
+    function updateUI(t) {
+      scrubber.value = t;
+      scrubber.style.setProperty('--prog', `${(t / DURATION) * 100}%`);
+      timeLabel.textContent = `${fmtTime(t)} / ${fmtTime(DURATION)}`;
+
+      const activeSceneStart = t < 5 ? 0 : t < 20 ? 5 : t < 40 ? 20 : t < 60 ? 40 : 60;
+      scenePills.forEach(p => {
+        p.classList.toggle('active', Number(p.dataset.t) === activeSceneStart);
+      });
+
+      if (isRecording) {
+        recText.textContent = `REC ${fmtTime(t)}`;
+      }
+    }
+
+    function loop(timestamp) {
+      if (lastTimestamp === null) lastTimestamp = timestamp;
+      const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        const prev = currentTime;
+        currentTime += dt;
+
+        if (currentTime >= DURATION) {
+          currentTime = DURATION;
+          isPlaying = false;
+          playBtn.textContent = '▶ Play';
+          sfx.updateAmbient(currentTime, false);
+          renderFrame(currentTime);
+          if (isRecording) stopRecording();
+          return;
+        }
+
+        sfx.checkCues(prev, currentTime);
+        sfx.updateAmbient(currentTime, true);
+      }
+
+      renderFrame(currentTime);
+      requestAnimationFrame(loop);
+    }
+
+    // =========================================================================
+    // PLAYBACK & RECORDING CONTROLS
+    // =========================================================================
+    function startPlayback() {
+      sfx.init();
+      if (currentTime >= DURATION - 0.05) {
+        currentTime = 0;
+        sfx.resetCues(0);
+      }
+      isPlaying = true;
+      lastTimestamp = null;
+      playBtn.textContent = '❚❚ Pause';
+      sfx.updateAmbient(currentTime, true);
+    }
+
+    function pausePlayback() {
+      isPlaying = false;
+      playBtn.textContent = '▶ Play';
+      sfx.updateAmbient(currentTime, false);
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) pausePlayback();
+      else startPlayback();
+    });
+
+    canvas.addEventListener('click', () => {
+      if (isPlaying) pausePlayback();
+      else startPlayback();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      sfx.init();
+      currentTime = 0;
+      sfx.resetCues(0);
+      startPlayback();
+    });
+
+    muteBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      sfx.setMuted(isMuted);
+      muteBtn.textContent = isMuted ? '🔇 Muted' : '🔊 SFX On';
+    });
+
+    scrubber.addEventListener('input', (e) => {
+      sfx.init();
+      currentTime = parseFloat(e.target.value);
+      sfx.resetCues(currentTime);
+      sfx.updateAmbient(currentTime, isPlaying);
+      renderFrame(currentTime);
+    });
+
+    scenePills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        sfx.init();
+        currentTime = Number(pill.dataset.t);
+        sfx.resetCues(currentTime);
+        startPlayback();
+      });
+    });
+
+    // MediaRecorder Video Export (Canvas 30fps + Web Audio Stream)
+    function startRecording() {
+      sfx.init();
+      recordedChunks = [];
+
+      const videoStream = canvas.captureStream(30);
+      const audioTracks = sfx.mediaDest ? sfx.mediaDest.stream.getAudioTracks() : [];
+      const combinedStream = new MediaStream([
+        ...videoStream.getVideoTracks(),
+        ...audioTracks
+      ]);
+
+      const mimeTypes = [
+        'video/webm;codecs=vp9,opus',
+        'video/webm;codecs=vp8,opus',
+        'video/webm',
+        'video/mp4'
+      ];
+      const chosenMime = mimeTypes.find(m => MediaRecorder.isTypeSupported(m)) || '';
+
+      try {
+        mediaRecorder = chosenMime
+          ? new MediaRecorder(combinedStream, { mimeType: chosenMime, videoBitsPerSecond: 6000000 })
+          : new MediaRecorder(combinedStream);
+      } catch (err) {
+        alert('MediaRecorder is not supported in this browser: ' + err.message);
+        return;
+      }
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `1991-sosus-acoustic-void.${blob.type.includes('mp4') ? 'mp4' : 'webm'}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+      };
+
+      // Restart from 00:00 cleanly for full export
+      currentTime = 0;
+      sfx.resetCues(0);
+      isRecording = true;
+      recBadge.classList.add('active');
+      recordBtn.classList.add('recording');
+      recordBtn.textContent = '■ Stop & Save';
+
+      mediaRecorder.start(200);
+      startPlayback();
+    }
+
+    function stopRecording() {
+      if (!isRecording) return;
+      isRecording = false;
+      recBadge.classList.remove('active');
+      recordBtn.classList.remove('recording');
+      recordBtn.textContent = '● Record Video';
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      pausePlayback();
+    }
+
+    recordBtn.addEventListener('click', () => {
+      if (isRecording) stopRecording();
+      else startRecording();
+    });
+
+    // Initial Frame & Animation Loop
+    renderFrame(0);
+    requestAnimationFrame(loop);
+  })();
+  </script>
+</body>
+</html>
